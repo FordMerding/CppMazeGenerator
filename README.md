@@ -1,0 +1,2 @@
+# CppMazeGenerator
+A beautiful maze generator in clear c++ code in terminal.
