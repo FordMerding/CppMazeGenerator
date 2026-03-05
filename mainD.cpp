@@ -2,110 +2,77 @@
 #define pb push_back
 using namespace std;
 
-bool used[10000];
+int width = 15, height = 15;
+int map_width = width * 2 + 1;
+int map_height = height * 2 + 1;
 
-int width = 20, height = 20;
-
-set<int> vec[10000];
-// u l d r
+map<pair<int, int>, bool> used;
+string map_map[1000][1000];
+// up left down right
 string walls[2][2][2][2] = {{{{"╬", "╣"}, {"╩", "╝"}}, {{"╠", "║"}, {"╚", "╨"}}}, {{{"╦", "╗"}, {"═", "╡"}}, {{"╔", "╥"}, {"╞", "▫"}}}};
 
-void dfs(int v){
-    used[v] = 1;
+void dfs(int x, int y){
+    map_map[y][x] = " ";
+    used[{x, y}] = 1;
     int dir[4] = {1, 2, 3, 4};
     random_shuffle(dir, dir+4);
-    for(auto x: dir){
-        if(x == 1 && !used[v-width] && v-width > -1){
-            vec[v-width].insert(v);
-            dfs(v-width);
+    for(auto d: dir){
+        if(d == 1 && y-2 > 0 && !used[{x, y-2}]){
+            map_map[y-1][x] = " ";
+            dfs(x, y-2);
         }
-        else if(x == 2 && !used[v+1] && v+1 < (v/width+1)*width){
-            vec[v].insert(v+1);
-            dfs(v+1);
+        else if(d == 2 && x+2 < map_width && !used[{x+2, y}]){
+            map_map[y][x+1] = " ";
+            dfs(x+2, y);
         }
-        else if(x == 3 && !used[v+width] && v + width < width * height){
-            vec[v].insert(v+width);
-            dfs(v+width);
+        else if(d == 3 && y+2 < map_height && !used[{x, y+2}]){
+            map_map[y+1][x] = " ";
+            dfs(x, y+2);
         }
-        else if(x == 4 && !used[v-1] && v-1 >= (v/width)*width && v-1 > 0){
-            vec[v-1].insert(v);
-            dfs(v-1);
+        else if(d == 4 && x-2 > 0 && !used[{x-2, y}]){
+            map_map[y][x-1] = " ";
+            dfs(x-2, y);
         }
     }
 }
 
 void do_maze(){
-    for(int i = 0; i < width * height; i++){
-        used[i] = 0;
-        vec[i].clear();
+    used.clear();
+    for(int i = 0; i < map_height; i++){
+        for(int j = 0; j < map_width; j++){
+            map_map[i][j] = "#"; 
+        }
     }
-    dfs(0);
+    dfs(1, 1);
 }
 
-void write_line(){
-    cout<<"╔";
-    for(int i = 0; i < width-1; i++){
-        cout<<"═";
-        if(vec[i].count(i+1))
-        cout<<"═";
-        else
-        cout<<"╦";
+void apply_filter(){
+    for(int i = 0; i < map_height; i++){
+        for(int j = 0; j < map_width; j++){
+            if(map_map[i][j] == " ") continue;
+
+            bool up = 1, left = 1, down = 1, right = 1;
+            
+            if(i-1 >= 0)
+                up = (map_map[i-1][j] == " ");
+            if(j-1 >= 0)
+                left = (map_map[i][j-1] == " ");
+            if(i+1 < map_height)
+                down = (map_map[i+1][j] == " ");
+            if(j+1 < map_width)
+                right = (map_map[i][j+1] == " ");
+            map_map[i][j] = walls[up][left][down][right];
+        }
     }
-    cout<<"═╗";
-    cout<<"\n";
 }
 
 int main(){
     srand(static_cast<unsigned int>(time(nullptr)));
-    // srand(42);
     do_maze();
-    write_line();
-    for(int i = 0; i < height; i++){
-        cout<<"║";
-        for(int j = 0; j < width; j++){
-            cout<<" ";
-            if(j == width - 1)
-            cout<<"║";
-            else{    
-                if(vec[i*width + j].count(i*width + j + 1)){
-                    cout<<" ";
-                }
-                else cout<<"║";
-            }
-        }
-        cout<<"\n";
-        
-        if(i == height-1){
-            cout<<"╚";
-        }
-        else if(vec[i*width].count(i*width+width))
-            cout<<"║";
-        else
-            cout<<"╠";
-        
-        for(int j = 0; j < width; j++){
-            if(vec[i*width+j].count(i*width+j+width)){
-                cout<<" ";
-            }
-            else{
-                cout<<"═";
-            }
-
-            bool down = 0, up = 0, left = 0, right = 0;
-            left = vec[i*width+j].count((i+1)*width+j);
-            if(j+1 < width){
-                right = vec[i*width+j+1].count((i+1)*width+j+1);
-                down = vec[(i+1)*width+j].count((i+1)*width+j+1);
-                up = vec[i*width+j].count(i*width+j+1);
-            }
-            else{
-                right = 1;
-            }
-
-            if(i == height -1){
-                down = 1;
-            }
-            cout<<walls[up][left][down][right];
+    apply_filter();
+    for(int i = 0; i < map_height; i++){
+        for(int j = 0; j < map_width; j++){
+            cout<<map_map[i][j];
         }
         cout<<"\n";
     }
