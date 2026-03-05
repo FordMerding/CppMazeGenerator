@@ -7,8 +7,8 @@ bool used[10000];
 int width = 20, height = 20;
 
 set<int> vec[10000];
-
-
+// u l d r
+string walls[2][2][2][2] = {{{{"╬", "╣"}, {"╩", "╝"}}, {{"╠", "║"}, {"╚", "╨"}}}, {{{"╦", "╗"}, {"═", "╡"}}, {{"╔", "╥"}, {"╞", "▫"}}}};
 
 void dfs(int v){
     used[v] = 1;
@@ -91,7 +91,6 @@ int main(){
                 cout<<"═";
             }
 
-            
             bool down = 0, up = 0, left = 0, right = 0;
             left = vec[i*width+j].count((i+1)*width+j);
             if(j+1 < width){
@@ -106,63 +105,8 @@ int main(){
             if(i == height -1){
                 down = 1;
             }
-            if(down & up & left & right){
-                cout<<"▫";
-            }
-            else if(down & up & left & !right){
-                cout<<"╞";
-            }
-            else if(down & up & !left & right){
-                cout<<"╡";
-            }
-            else if(down & up & !left & !right){
-                cout<<"═";
-            }
-            else if(down & !up & left & right){
-                cout<<"╨";
-            }
-            else if(down & !up & left & !right){
-                cout<<"╚";
-            }
-            else if(down & !up & !left & right){
-                cout<<"╝";
-            }
-            else if(down & !up & !left & !right){
-                cout<<"╩";
-            }
-            else if(!down & up & left & right){
-                cout<<"╥";
-            }
-            else if(!down & up & left & !right){
-                cout<<"╔";
-            }
-            else if(!down & up & !left & right){
-                cout<<"╗";
-            }
-            else if(!down & up & !left & !right){
-                cout<<"╦";
-            }
-            else if(!down & !up & left & right){
-                cout<<"║";
-            }
-            else if(!down & !up & left & !right){
-                cout<<"╠";
-            }
-            else if(!down & !up & !left & right){
-                cout<<"╣";
-            }
-            else if(!down & !up & !left & !right){
-                cout<<"╬";
-            }
-            else cout<<"#";
+            cout<<walls[up][left][down][right];
         }
         cout<<"\n";
     }
-    // for(int i = 0; i < width * height; i++){
-    //     cout<<i<<":";
-    //     for(auto x: vec[i]){
-    //         cout<<" "<<x;
-    //     }
-    //     cout<<"\n";
-    // }
 }
